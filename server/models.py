@@ -17,8 +17,10 @@ class Coffee(db.Model, SerializerMixin):
     name = db.Column(db.String)
 
     # add relationship
-    
+    orders = db.relationship('Order', back_populates='coffee', cascade='all, delete-orphan')
+
     # add serialization rules
+    serialize_rules = ('-orders.coffee',)
 
     def __repr__(self):
         return f'<Coffee {self.id} {self.name}>'
@@ -31,8 +33,10 @@ class Customer(db.Model, SerializerMixin):
     name = db.Column(db.String)
 
     # add relationship
+    orders = db.relationship('Order', back_populates='customer', cascade='all, delete-orphan')
     
     # add serialization rules
+    serialize_rules = ('-orders.customer',)
 
     def __repr__(self):
         return f'<Customer {self.id} {self.name}>'
@@ -46,9 +50,15 @@ class Order(db.Model, SerializerMixin):
     customization = db.Column(db.String)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
+    coffee_id = db.Column(db.Integer, db.ForeignKey('coffees.id'))
+    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'))
+
     # add relationship
+    coffee = db.relationship('Coffee', back_populates='orders')
+    customer = db.relationship('Customer', back_populates='orders')
 
     # add serialization rules
+    serialize_rules = ('-coffee.orders', '-customers.orders')
 
     def __repr__(self):
         return f'<Order {self.id} {self.price} {self.created_at} {self.customization}>'
