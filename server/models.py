@@ -22,6 +22,15 @@ class Coffee(db.Model, SerializerMixin):
     # add serialization rules
     serialize_rules = ('-orders.coffee',)
 
+    #validate
+    @validates('name')
+    def validate_name(self, key, name):
+        coffees = [coffee.name for coffee in Coffee.query.all()]
+        if name in coffees:
+            raise ValueError("Coffee must have a unique name")
+        else:
+            return name
+
     def __repr__(self):
         return f'<Coffee {self.id} {self.name}>'
 
@@ -59,6 +68,14 @@ class Order(db.Model, SerializerMixin):
 
     # add serialization rules
     serialize_rules = ('-coffee.orders', '-customers.orders')
+
+    # validation
+    @validates('price')
+    def validate_price(self, key, price):
+        if price < 2:
+            raise ValueError("Price must be greater than or equal to 2")
+        else:
+            return price
 
     def __repr__(self):
         return f'<Order {self.id} {self.price} {self.created_at} {self.customization}>'
