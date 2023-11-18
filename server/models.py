@@ -19,6 +19,8 @@ class Coffee(db.Model, SerializerMixin):
     # add relationship
     orders = db.relationship('Order', back_populates='coffee', cascade='all, delete-orphan')
 
+    customers = association_proxy('orders', 'customer')
+
     # add serialization rules
     serialize_rules = ('-orders.coffee',)
 
@@ -43,6 +45,8 @@ class Customer(db.Model, SerializerMixin):
 
     # add relationship
     orders = db.relationship('Order', back_populates='customer', cascade='all, delete-orphan')
+
+    coffees = association_proxy('orders', 'coffee')
     
     # add serialization rules
     serialize_rules = ('-orders.customer',)
